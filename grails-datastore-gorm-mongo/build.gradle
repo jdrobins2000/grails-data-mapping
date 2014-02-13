@@ -15,6 +15,7 @@ dependencies {
             project(":grails-datastore-gorm-plugin-support"),
             project(":grails-datastore-mongo"),
             project(":grails-datastore-core")
+
     testCompile project(":grails-datastore-gorm-test"),
                 project(":grails-datastore-gorm-tck")
 
