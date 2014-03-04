@@ -15,7 +15,9 @@
 package org.grails.datastore.mapping.cassandra;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +30,7 @@ import groovy.util.ConfigObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.grails.datastore.mapping.core.AbstractDatastore;
 import org.grails.datastore.mapping.core.Session;
@@ -68,14 +71,30 @@ public class CassandraDatastore extends AbstractDatastore {
 		Cluster.Builder builder = Cluster.builder();
 
 		for (String contactPoint : contactPoints) {
-			builder = builder.addContactPoint(contactPoint);
+			builder.addContactPoint(contactPoint);
 		}
-
-		builder = builder.withRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE)
+		builder.withRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE)
 			.withReconnectionPolicy(new ConstantReconnectionPolicy(100L))
 			.withSocketOptions(new SocketOptions().setKeepAlive(true));
 
 		this.cluster = builder.build();
+
+        initializeConverters(mappingContext);
+
+        mappingContext.getConverterRegistry().addConverter(new Converter<Date, Calendar>() {
+            public Calendar convert(Date source) {
+                Calendar dest = Calendar.getInstance();
+                dest.setTime(source);
+                return dest;
+            }
+        });
+
+        mappingContext.getConverterRegistry().addConverter(new Converter<Calendar, Date>() {
+            public Date convert(Calendar source) {
+                return source.getTime();
+            }
+        });
+
 	}
 
 	public CassandraDatastore() {
@@ -92,4 +111,11 @@ public class CassandraDatastore extends AbstractDatastore {
 			throw new DataAccessResourceFailureException("Failed to obtain Cassandra client session: " + e.getMessage(), e);
 		}
 	}
+
+    @Override
+    public void destroy() throws Exception {
+        cluster.shutdown();
+        super.destroy();
+    }
+	
 }

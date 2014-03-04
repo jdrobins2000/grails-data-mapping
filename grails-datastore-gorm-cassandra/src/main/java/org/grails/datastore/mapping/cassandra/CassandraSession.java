@@ -37,19 +37,27 @@ public class CassandraSession extends AbstractSession<Session> {
 	private Session session;
 	private ApplicationEventPublisher applicationEventPublisher;
 
-	public CassandraSession(Datastore ds, MappingContext context, Cluster cluster, ApplicationEventPublisher applicationEventPublisher, boolean stateless) {
-		super(ds, context, applicationEventPublisher, stateless);
+    public CassandraSession(Datastore ds, MappingContext context, Cluster cluster, ApplicationEventPublisher applicationEventPublisher, boolean stateless) {
+        super(ds, context, applicationEventPublisher, stateless);
 
-		this.cluster = cluster;
-		this.applicationEventPublisher = applicationEventPublisher;
-		this.session = cluster.connect(); //TODO review need of session
-	}
+        this.cluster = cluster;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.session = cluster.connect(); //TODO review need of session
+    }
+
+    public CassandraSession(Datastore ds, MappingContext context, Cluster cluster, ApplicationEventPublisher applicationEventPublisher, Session session, boolean stateless) {
+        super(ds, context, applicationEventPublisher, stateless);
+
+        this.cluster = cluster;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.session = session; //TODO review need of session
+    }
 
 	@Override
 	protected Persister createPersister(Class cls, MappingContext mappingContext) {
 		PersistentEntity entity = mappingContext.getPersistentEntity(cls.getName());
 		if (entity != null) {
-			return new CassandraEntityPersister(mappingContext, entity, this, session,applicationEventPublisher);
+			return new CassandraEntityPersister(mappingContext, entity, this,applicationEventPublisher);
 		}
 		return null;
 	}
