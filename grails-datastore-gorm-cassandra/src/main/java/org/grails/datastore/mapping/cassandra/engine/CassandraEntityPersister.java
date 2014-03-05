@@ -26,6 +26,8 @@ import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Update;
+import com.datastax.driver.core.utils.UUIDs;
+
 import org.grails.datastore.mapping.engine.EntityAccess;
 import org.grails.datastore.mapping.keyvalue.engine.AbstractKeyValueEntityPersister;
 import org.grails.datastore.mapping.keyvalue.mapping.config.Family;
@@ -183,7 +185,7 @@ public class CassandraEntityPersister extends AbstractKeyValueEntityPersister<Ke
 
 	@Override
 	protected Object generateIdentifier(PersistentEntity persistentEntity, KeyValueEntry id) {
-		return UUID.randomUUID(); //TODO review if this is the correct UUID type we want.
+		return UUIDs.timeBased(); //TODO review if this is the correct UUID type we want.
 	}
 
 	private String getKeyspaceName() {

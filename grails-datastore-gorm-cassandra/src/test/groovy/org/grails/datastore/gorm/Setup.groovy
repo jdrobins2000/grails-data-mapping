@@ -167,8 +167,8 @@ class Setup {
 			cassandraType = "text"
 		} else if (c.equals(Date.class) || (Calendar.class.isAssignableFrom(c))) {
 			cassandraType = "timestamp"
-		} else if (c.equals(UUID.class)) {
-			cassandraType = "uuid"
+        } else if (c.equals(UUID.class)) {
+            cassandraType = "timeuuid"
 		} else if (c.equals(BigInteger.class)) {
 			cassandraType = "varint"
 		}
